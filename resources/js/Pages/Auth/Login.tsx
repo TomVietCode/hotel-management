@@ -30,7 +30,7 @@ export default function Login({
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title="Đăng nhập" />
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
@@ -52,12 +52,13 @@ export default function Login({
                         isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
                     />
-
-                    <InputError message={errors.email} className="mt-2" />
+                    <div className="min-h-5 mt-2">
+                        <InputError message={errors.email}/>
+                    </div>
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="Mật khẩu" />
 
                     <TextInput
                         id="password"
@@ -69,7 +70,9 @@ export default function Login({
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <div className="min-h-5 mt-2">
+                        <InputError message={errors.password}/>
+                    </div>
                 </div>
 
                 <div className="mt-4 block">
@@ -85,23 +88,14 @@ export default function Login({
                             }
                         />
                         <span className="ms-2 text-sm text-gray-600">
-                            Remember me
+                            Ghi nhớ đăng nhập
                         </span>
                     </label>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
+                <div className="mt-4 flex items-center justify-end ">
+                    <PrimaryButton className="ms-4 bg-primary-500" disabled={processing}>
+                        Đăng nhập
                     </PrimaryButton>
                 </div>
             </form>
