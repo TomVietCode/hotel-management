@@ -13,9 +13,7 @@ class Rate extends Model
         'total_rooms',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-    ];
+    
 
     public function rooms()
     {

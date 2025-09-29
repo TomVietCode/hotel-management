@@ -13,11 +13,14 @@ interface Rate {
 }
 
 export default function Rate({ rates }: { rates: Rate[] }) {
+  console.log(rates )
   const columns: Column<Rate>[] = [
     {header: "Loại phòng", accessor: "room_type"},
     {header: "Chính sách hủy", accessor: "cancellation_policy"},
-    {header: "Giá", accessor: (rate: Rate) => `$ ${rate.price.toLocaleString()}`},
-    {header: "Số phòng còn lại", accessor: "available_rooms"},
+    {header: "Giá (VND)", accessor: (rate: Rate) => `${Number(rate.price).toLocaleString()}`},
+    {header: "Phòng trống", accessor: (rate: Rate) => {
+      return <span className="text-green-500">{rate.total_rooms}/{rate.total_rooms}</span>
+    }},
   ]
   return (
     <AuthenticatedLayout>
@@ -25,12 +28,13 @@ export default function Rate({ rates }: { rates: Rate[] }) {
 
       <div className="mb-6 mx-3">
         {/* Actions buttons */}
-        <div className="flex justify-end mr-4">
+        <div className="flex justify-end mr-4 mb-8">
           <PrimaryButton>
             Thêm giá phòng
           </PrimaryButton>
         </div>
 
+        {/* Table */}
         <DataTable data={rates} columns={columns}>
         </DataTable>
       </div>
