@@ -1,104 +1,99 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import Checkbox from "@/Components/Checkbox";
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { Head, Link, useForm } from "@inertiajs/react";
+import { FormEventHandler } from "react";
 
 export default function Login({
-    status,
-    canResetPassword,
+  status,
+  canResetPassword,
 }: {
-    status?: string;
-    canResetPassword: boolean;
+  status?: string;
+  canResetPassword: boolean;
 }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false as boolean,
+  const { data, setData, post, processing, errors, reset } = useForm({
+    email: "",
+    password: "",
+    remember: false as boolean,
+  });
+
+  const submit: FormEventHandler = (e) => {
+    e.preventDefault();
+
+    post(route("login"), {
+      onFinish: () => reset("password"),
     });
+  };
 
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
+  return (
+    <GuestLayout>
+      <Head title="Đăng nhập" />
 
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
-    };
+      {status && (
+        <div className="mb-4 text-sm font-medium text-green-600">{status}</div>
+      )}
 
-    return (
-        <GuestLayout>
-            <Head title="Đăng nhập" />
+      <form onSubmit={submit}>
+        <div>
+          <InputLabel htmlFor="email" value="Email" />
 
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+          <TextInput
+            id="email"
+            type="email"
+            name="email"
+            value={data.email}
+            className="mt-1 block w-full"
+            autoComplete="username"
+            isFocused={true}
+            onChange={(e) => setData("email", e.target.value)}
+          />
+          <div className="min-h-5 mt-2">
+            <InputError message={errors.email} />
+          </div>
+        </div>
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+        <div className="mt-4">
+          <InputLabel htmlFor="password" value="Mật khẩu" />
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-                    <div className="min-h-5 mt-2">
-                        <InputError message={errors.email}/>
-                    </div>
-                </div>
+          <TextInput
+            id="password"
+            type="password"
+            name="password"
+            value={data.password}
+            className="mt-1 block w-full"
+            autoComplete="current-password"
+            onChange={(e) => setData("password", e.target.value)}
+          />
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Mật khẩu" />
+          <div className="min-h-5 mt-2">
+            <InputError message={errors.password} />
+          </div>
+        </div>
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
+        <div className="mt-4 block">
+          <label className="flex items-center">
+            <Checkbox
+              name="remember"
+              checked={data.remember}
+              onChange={(e) =>
+                setData("remember", (e.target.checked || false) as false)
+              }
+            />
+            <span className="ms-2 text-sm text-gray-600">
+              Ghi nhớ đăng nhập
+            </span>
+          </label>
+        </div>
 
-                    <div className="min-h-5 mt-2">
-                        <InputError message={errors.password}/>
-                    </div>
-                </div>
-
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData(
-                                    'remember',
-                                    (e.target.checked || false) as false,
-                                )
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Ghi nhớ đăng nhập
-                        </span>
-                    </label>
-                </div>
-
-                <div className="mt-4 flex items-center justify-end ">
-                    <PrimaryButton className="ms-4 bg-primary-500" disabled={processing}>
-                        Đăng nhập
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
-    );
+        <div className="mt-4 flex items-center justify-end ">
+          <PrimaryButton className="ms-4 bg-primary-500" disabled={processing}>
+            Đăng nhập
+          </PrimaryButton>
+        </div>
+      </form>
+    </GuestLayout>
+  );
 }
