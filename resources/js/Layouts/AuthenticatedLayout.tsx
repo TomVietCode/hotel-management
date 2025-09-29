@@ -81,7 +81,7 @@ export default function Authenticated({
               className={`flex items-center rounded-lg px-4 py-3 text-gray-700 ${
                 route().current("dashboard")
                   ? "bg-primary-50 text-primary-600"
-                  : "hover:bg-primary-50 text-primary-600"
+                  : "hover:bg-primary-50 hover:text-primary-600"
               }`}
             >
               <svg
@@ -101,10 +101,14 @@ export default function Authenticated({
               <span className="ml-3">Trang chủ</span>
             </Link>
 
-            {/* Front desk */}
+            {/* Bookings */}
             <Link
-              href="#"
-              className="flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+              href="/bookings"
+              className={`flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 ${
+                route().current("bookings.index")
+                  ? "bg-primary-50 text-primary-600"
+                  : "hover:bg-primary-50 hover:text-primary-600"
+              }`}
             >
               <svg
                 className="h-5 w-5"
@@ -125,8 +129,12 @@ export default function Authenticated({
 
             {/* Guests */}
             <Link
-              href="#"
-              className="flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+              href="/guest"
+              className={`flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 ${
+                route().current("guest.index")
+                  ? "bg-primary-50 text-primary-600"
+                  : "hover:bg-primary-50 hover:text-primary-600"
+              }`}
             >
               <svg
                 className="h-5 w-5"
@@ -147,8 +155,12 @@ export default function Authenticated({
 
             {/* Rooms */}
             <Link
-              href="#"
-              className="flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+              href="/rooms"
+              className={`flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 ${
+                route().current("rooms.index")
+                  ? "bg-primary-50 text-primary-600"
+                  : "hover:bg-primary-50 hover:text-primary-600"
+              }`}
             >
               <svg
                 className="h-5 w-5"
@@ -169,8 +181,12 @@ export default function Authenticated({
 
             {/* Rate */}
             <Link
-              href="#"
-              className="flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+              href="/rates"
+              className={`flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 ${
+                route().current("rates.index")
+                  ? "bg-primary-50 text-primary-600"
+                  : "hover:bg-primary-50 hover:text-primary-600"
+              }`}
             >
               <svg
                 className="h-5 w-5"
@@ -191,7 +207,7 @@ export default function Authenticated({
           </div>
         </aside>
       </div>
-      <main className="ml-64 pl-2 py-2">{children}</main>
+      <main className="ml-64 mt-5 pl-2 py-2">{children}</main>
     </div>
   );
 }
