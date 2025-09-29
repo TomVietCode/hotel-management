@@ -8,7 +8,6 @@ export default function Authenticated({
   children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
   const user = usePage().props.auth.user;
-
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="border-b border-gray-100">
