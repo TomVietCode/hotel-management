@@ -1,5 +1,6 @@
 import DataTable, { Column } from "@/Components/DataTable";
 import PrimaryButton from "@/Components/PrimaryButton";
+import Pill from "@/Components/ui/Pill";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 
@@ -13,13 +14,12 @@ interface Rate {
 }
 
 export default function Rate({ rates }: { rates: Rate[] }) {
-  console.log(rates )
   const columns: Column<Rate>[] = [
     {header: "Loại phòng", accessor: "room_type"},
     {header: "Chính sách hủy", accessor: "cancellation_policy"},
     {header: "Giá (VND)", accessor: (rate: Rate) => `${Number(rate.price).toLocaleString()}`},
     {header: "Phòng trống", accessor: (rate: Rate) => {
-      return <span className="text-green-500">{rate.total_rooms}/{rate.total_rooms}</span>
+      return (<Pill className="text-sm">{rate.total_rooms}/{rate.total_rooms}</Pill>)
     }},
   ]
   return (
@@ -35,7 +35,7 @@ export default function Rate({ rates }: { rates: Rate[] }) {
         </div>
 
         {/* Table */}
-        <DataTable data={rates} columns={columns}>
+        <DataTable data={rates} columns={columns} actionButton={true}>
         </DataTable>
       </div>
     </AuthenticatedLayout>
