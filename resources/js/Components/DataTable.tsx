@@ -42,7 +42,7 @@ export default function DataTable<T extends { id: number | string }>({
                 {column.header}
               </th>
             ))}
-            {actionButton && <th>Thao tác</th>}
+            <th className="px-2 py-3 font-medium text-sm w-32">Thao tác</th>
           </tr>
         </thead>
 
@@ -72,7 +72,7 @@ export default function DataTable<T extends { id: number | string }>({
                         className="size-5 cursor-pointer text-gray-600 hover:text-gray-800"
                       />
                     </Dropdown.Trigger>
-                    <Dropdown.Content align="left" width="32" contentClasses="py-1 bg-white">
+                    <Dropdown.Content align="left" width="28" contentClasses="py-1 bg-white">
                       <Dropdown.Link className="text-primary-600">
                         <FontAwesomeIcon icon={faPenToSquare} className="mr-2 size-4" />
                         Sửa

@@ -45,7 +45,7 @@ export default function Login({
             type="email"
             name="email"
             value={data.email}
-            className="mt-1 block w-full"
+            className={`mt-1 block w-full ${errors.email ? "border-red-500" : ""}`}
             autoComplete="username"
             isFocused={true}
             onChange={(e) => setData("email", e.target.value)}
@@ -55,7 +55,7 @@ export default function Login({
           </div>
         </div>
 
-        <div className="mt-4">
+        <div className="">
           <InputLabel htmlFor="password" value="Mật khẩu" />
 
           <TextInput
@@ -63,7 +63,7 @@ export default function Login({
             type="password"
             name="password"
             value={data.password}
-            className="mt-1 block w-full"
+            className={`mt-1 block w-full ${errors.password ? "border-red-500" : ""}`}
             autoComplete="current-password"
             onChange={(e) => setData("password", e.target.value)}
           />
