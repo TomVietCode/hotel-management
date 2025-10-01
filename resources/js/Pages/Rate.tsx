@@ -13,6 +13,7 @@ interface Rate {
   id: number;
   room_type: string;
   cancellation_policy: string;
+  displayPolicy?: string | null;
   price: number;
   total_rooms: number;
   available_rooms: number;
@@ -20,17 +21,18 @@ interface Rate {
 
 export default function Rate({ rates }: { rates: Rate[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const [isEdit, setIsEdit] = useState(false)
+  const { data, setData, post, patch, delete: destroy, processing, errors, reset } = useForm({
+    id: 0,
     room_type: "",
     cancellation_policy: "strict",
-    price: "",
-    total_rooms: ''
+    price: 0,
+    total_rooms: 0
   });
   
   const columns: Column<Rate>[] = [
     { header: "Loại phòng", accessor: "room_type" },
-    { header: "Chính sách hủy", accessor: "cancellation_policy" },
+    { header: "Chính sách hủy", accessor: (rate: Rate) => rate.displayPolicy },
     {
       header: "Giá (VND)",
       accessor: (rate: Rate) => `${Number(rate.price).toLocaleString()}`,
@@ -47,21 +49,54 @@ export default function Rate({ rates }: { rates: Rate[] }) {
     },
   ];
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    post(route("rates.store"), {
-      onSuccess: () => {
-        reset();
-        setIsModalOpen(false);
-      }
-    });
-  };
+
   const policyMap: Record<string, string> = {
     "strict": "Nghiêm ngặt",
     "flexible": "Linh hoạt",
     "non_refundable": "Không hoàn tiền"
   }
-  const newRates = rates.map(rate => ({...rate, cancellation_policy: policyMap[rate.cancellation_policy]}))
+
+  const newRates = rates.map(rate => ({...rate, displayPolicy: policyMap[rate.cancellation_policy]}))
+
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if(!isEdit) {
+      post(route("rates.store"), {
+        onSuccess: () => {
+          reset();
+          setIsModalOpen(false);
+        }
+      });
+    } else {
+      patch(route("rates.update", { rate: data.id }), {
+        onSuccess: () => {
+          reset();
+          setIsModalOpen(false);
+        }
+      });
+    }
+  };
+
+  const editRate = (rate: Rate) => {
+    setData({
+      id: rate.id,
+      room_type: rate.room_type,
+      cancellation_policy: rate.cancellation_policy,
+      price: rate.price,
+      total_rooms: rate.total_rooms
+    });
+    setIsEdit(true)
+    setIsModalOpen(true);
+  }
+
+  const deleteRate = (rate: Rate) => {
+    destroy(route("rates.destroy", { rate: rate.id }), {
+      onSuccess: () => {
+        reset();
+      }
+    });
+  }
+
   return (
     <AuthenticatedLayout>
       <Head title="Giá phòng" />
@@ -69,7 +104,7 @@ export default function Rate({ rates }: { rates: Rate[] }) {
       <div className="mb-6 mx-3">
         {/* Actions buttons */}
         <div className="flex justify-end mr-4 mb-8">
-          <PrimaryButton onClick={() => setIsModalOpen(true)}>
+          <PrimaryButton onClick={() => (setIsModalOpen(true), setIsEdit(false), reset())}>
             Thêm giá phòng
           </PrimaryButton>
         </div>
@@ -78,14 +113,15 @@ export default function Rate({ rates }: { rates: Rate[] }) {
         <DataTable
           data={newRates}
           columns={columns}
-          actionButton={true}
+          onEdit={editRate}
+          onDelete={deleteRate}
         ></DataTable>
 
         {/* Modal */}
-        <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Modal show={isModalOpen} onClose={() => (setIsModalOpen(false))}>
           <form onSubmit={submit} className="p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">
-              Thêm giá phòng mới
+              {isEdit ? "Sửa giá phòng" : "Thêm giá phòng"}
             </h2>
 
             <div className="mt-1">
@@ -125,13 +161,21 @@ export default function Rate({ rates }: { rates: Rate[] }) {
             </div>
 
             <div className="mt-1">
-              <InputLabel htmlFor="price" value="Giá phòng (VND)" />
+              <InputLabel htmlFor="price" value="Giá 1 đêm (VND)" />
               <TextInput
                 id="price"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 className={`mt-1 block w-full ${errors.price ? "border-red-500" : ""}`}
-                value={data.price}
-                onChange={(e) => setData("price", e.target.value)}
+                value={
+                  data.price !== undefined && data.price !== null && data.price !== 0
+                    ? Number(data.price).toLocaleString()
+                    : ""
+                }
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/[^0-9]/g, "");
+                  setData("price", rawValue ? Number(rawValue) : 0);
+                }}
               />
               <div className="min-h-5 mt-2">
                 <InputError message={errors.price} />
@@ -144,8 +188,8 @@ export default function Rate({ rates }: { rates: Rate[] }) {
                 id="total_rooms"
                 type="number"
                 className={`mt-1 block w-full ${errors.total_rooms ? "border-red-500" : ""}`}
-                value={data.total_rooms}
-                onChange={(e) => setData("total_rooms", e.target.value)}
+                value={data.total_rooms || ""}
+                onChange={(e) => setData("total_rooms", Number(e.target.value))}
               />
               <div className="min-h-5 mt-2">
                 <InputError message={errors.total_rooms} />
@@ -154,7 +198,7 @@ export default function Rate({ rates }: { rates: Rate[] }) {
 
             <div className="mt-6 flex justify-end">
               <PrimaryButton disabled={processing} className="ml-4">
-                Thêm mới
+                {!isEdit ? "Thêm mới" : "Cập nhật"}
               </PrimaryButton>
               <button
                 type="button"

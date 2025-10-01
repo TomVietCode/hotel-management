@@ -17,14 +17,16 @@ interface DataTableProps<T extends { id: number | string }> {
   data: T[];
   columns: Column<T>[];
   onRowClick?: (row: T) => void;
-  actionButton?: boolean;
+  onEdit: (row: T) => void;
+  onDelete: (row: T) => void;
 }
 
 export default function DataTable<T extends { id: number | string }>({
   columns,
   data,
   onRowClick,
-  actionButton,
+  onEdit,
+  onDelete,
 }: DataTableProps<T>) {
   return (
     <div className="relative overflow-visible">
@@ -63,28 +65,40 @@ export default function DataTable<T extends { id: number | string }>({
                     : String(row[column.accessor as keyof T] ?? "")}
                 </td>
               ))}
-              {actionButton && (
-                <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                  <Dropdown>
-                    <Dropdown.Trigger >
+
+              <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                <Dropdown>
+                  <Dropdown.Trigger>
+                    <FontAwesomeIcon
+                      icon={faEllipsisVertical}
+                      className="size-5 cursor-pointer text-gray-600 hover:text-gray-800"
+                    />
+                  </Dropdown.Trigger>
+                  <Dropdown.Content
+                    align="right"
+                    width="28"
+                    contentClasses="py-1 bg-white"
+                  >
+                    <button
+                      className="block w-full px-4 py-2 text-start text-sm leading-5 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-primary-600"
+                      onClick={() => onEdit(row)}
+                    >
                       <FontAwesomeIcon
-                        icon={faEllipsisVertical}
-                        className="size-5 cursor-pointer text-gray-600 hover:text-gray-800"
+                        icon={faPenToSquare}
+                        className="mr-2 size-3"
                       />
-                    </Dropdown.Trigger>
-                    <Dropdown.Content align="left" width="28" contentClasses="py-1 bg-white">
-                      <Dropdown.Link className="text-primary-600">
-                        <FontAwesomeIcon icon={faPenToSquare} className="mr-2 size-4" />
-                        Sửa
-                      </Dropdown.Link>
-                      <Dropdown.Link className="text-red-600">
-                        <FontAwesomeIcon icon={faTrash} className="mr-2 size-4" />
-                        Xoá
-                      </Dropdown.Link>
-                    </Dropdown.Content>
-                  </Dropdown>
-                </td>
-              )}
+                      Sửa
+                    </button>
+                    <button
+                      className="block w-full px-4 py-2 text-start text-sm leading-5 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-red-600"
+                      onClick={() => onDelete(row)}
+                    >
+                      <FontAwesomeIcon icon={faTrash} className="mr-2 size-3" />
+                      Xoá
+                    </button>
+                  </Dropdown.Content>
+                </Dropdown>
+              </td>
             </tr>
           ))}
         </tbody>
