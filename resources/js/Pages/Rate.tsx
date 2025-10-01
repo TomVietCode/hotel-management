@@ -4,6 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import Modal from "@/Components/Modal";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
+import Toast from "@/Components/ui/Notification";
 import Pill from "@/Components/ui/Pill";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
@@ -22,7 +23,7 @@ interface Rate {
 export default function Rate({ rates }: { rates: Rate[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false)
-  const { data, setData, post, patch, delete: destroy, processing, errors, reset } = useForm({
+  const { data, setData, post, patch, delete: destroy, processing, errors, clearErrors, reset } = useForm({
     id: 0,
     room_type: "",
     cancellation_policy: "strict",
@@ -63,21 +64,27 @@ export default function Rate({ rates }: { rates: Rate[] }) {
     if(!isEdit) {
       post(route("rates.store"), {
         onSuccess: () => {
+          Toast.success("Thêm giá phòng thành công");
           reset();
           setIsModalOpen(false);
-        }
+        },
       });
     } else {
       patch(route("rates.update", { rate: data.id }), {
         onSuccess: () => {
+          Toast.success("Cập nhật giá phòng thành công");
           reset();
           setIsModalOpen(false);
+        },
+        onError: () => {
+          Toast.error("Cập nhật giá phòng thất bại");
         }
       });
     }
   };
 
   const editRate = (rate: Rate) => {
+    clearErrors()
     setData({
       id: rate.id,
       room_type: rate.room_type,
@@ -92,6 +99,7 @@ export default function Rate({ rates }: { rates: Rate[] }) {
   const deleteRate = (rate: Rate) => {
     destroy(route("rates.destroy", { rate: rate.id }), {
       onSuccess: () => {
+        Toast.success("Xóa thành công");
         reset();
       }
     });
@@ -104,7 +112,7 @@ export default function Rate({ rates }: { rates: Rate[] }) {
       <div className="mb-6 mx-3">
         {/* Actions buttons */}
         <div className="flex justify-end mr-4 mb-8">
-          <PrimaryButton onClick={() => (setIsModalOpen(true), setIsEdit(false), reset())}>
+          <PrimaryButton onClick={() => (setIsModalOpen(true), setIsEdit(false), reset(), clearErrors())}>
             Thêm giá phòng
           </PrimaryButton>
         </div>

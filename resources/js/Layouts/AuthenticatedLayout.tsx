@@ -2,7 +2,7 @@ import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import { Link, usePage } from "@inertiajs/react";
 import { PropsWithChildren, ReactNode, useState } from "react";
-
+import { ToastContainer } from "@/Components/ui/Notification";
 export default function Authenticated({
   header,
   children,
@@ -10,6 +10,7 @@ export default function Authenticated({
   const user = usePage().props.auth.user;
   return (
     <div className="min-h-screen bg-gray-100">
+      <ToastContainer />
       <nav className="border-b border-gray-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-end">
@@ -209,5 +210,6 @@ export default function Authenticated({
       </div>
       <main className="ml-64 mt-5 pl-2 py-2">{children}</main>
     </div>
+    
   );
 }
