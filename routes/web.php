@@ -29,6 +29,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/rates', [RateController::class, 'store'])->name('rates.store');
     Route::patch('/rates/{rate}', [RateController::class, 'update'])->name('rates.update');
     Route::delete('/rates/{rate}', [RateController::class, 'destroy'])->name('rates.destroy');
+    
+    // Rooms
+    Route::resource('rooms', \App\Http\Controllers\RoomController::class);
 });
 
 require __DIR__.'/auth.php';

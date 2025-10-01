@@ -3,6 +3,7 @@ import Dropdown from "@/Components/Dropdown";
 import { Link, usePage } from "@inertiajs/react";
 import { PropsWithChildren, ReactNode, useState } from "react";
 import { ToastContainer } from "@/Components/ui/Notification";
+
 export default function Authenticated({
   header,
   children,
@@ -156,9 +157,9 @@ export default function Authenticated({
 
             {/* Rooms */}
             <Link
-              href="/rooms"
+              href={route("rooms.index")}
               className={`flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 ${
-                route().current("rooms.index")
+                route().current("rooms.*")
                   ? "bg-primary-50 text-primary-600"
                   : "hover:bg-primary-50 hover:text-primary-600"
               }`}
@@ -182,9 +183,9 @@ export default function Authenticated({
 
             {/* Rate */}
             <Link
-              href="/rates"
+              href={route("rates.index")}
               className={`flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 ${
-                route().current("rates.index")
+                route().current("rates.*")
                   ? "bg-primary-50 text-primary-600"
                   : "hover:bg-primary-50 hover:text-primary-600"
               }`}
