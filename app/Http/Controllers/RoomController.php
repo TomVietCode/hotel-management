@@ -6,6 +6,7 @@ use App\Models\Rate;
 use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,7 +19,7 @@ class RoomController extends Controller
     {
         $filter = $request->get('filter', 'all'); // all, available, booked
         
-        $query = Room::with('rate');
+        $query = Room::orderBy('floor', 'asc')->with('rate'); 
         
         if ($filter === 'available') {
             $query->where('status', 'available');
@@ -61,14 +62,21 @@ class RoomController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'room_number' => 'required|integer|unique:rooms',
+            'room_number' => [
+                'required',
+                'integer',
+                Rule::unique('rooms')->where(function ($query) use ($request) {
+                    return $query->where('floor', $request->input('floor'));
+                }),
+            ],
             'bed_type' => 'required|string|in:single,double,triple',
             'floor' => 'required|integer',
             'facilities' => 'nullable|string',
             'rate_id' => 'required|exists:rates,id',
         ]);
 
-        $validated['status'] = 'available'; // Mặc định là available
+        // Mặc định trạng thái là available khi tạo mới phòng
+        $validated['status'] = 'available';
 
         Room::create($validated);
 
