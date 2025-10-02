@@ -26,12 +26,23 @@ class RoomController extends Controller
             $query->whereIn('status', ['booked', 'reserved']);
         }
         
-        $rooms = $query->paginate(10);
-        $rates = Rate::all(); // Cho dropdown loại phòng
-        
+        $rooms = $query->paginate(6);
+
+        $rates = Rate::orderBy('created_at', 'desc')->get();
+
+        $roomCounts = Room::selectRaw('rate_id, COUNT(*) as count')
+            ->groupBy('rate_id')
+            ->pluck('count', 'rate_id');
+
+        $finalRates = $rates->map(function ($rate) use ($roomCounts) {
+            $usedRooms = $roomCounts[$rate->id] ?? 0;
+            $rate->available_rooms = max(0, $rate->total_rooms - $usedRooms);
+            return $rate;
+        });
+
         return Inertia::render('Room', [
             'rooms' => $rooms,
-            'rates' => $rates,
+            'rates' => $finalRates,
             'filter' => $filter
         ]);
     }

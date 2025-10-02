@@ -1,8 +1,8 @@
-type PillColor = "primary" | "green" | "red" | "yellow"
+export type PillColor = "primary" | "green" | "red" | "yellow"
 
 interface PillProps {
   children: React.ReactNode;
-  color?: PillColor;
+  color: PillColor;
   className: string;
 }
 export default function Pill({ children, color = "primary", className = "" }: PillProps) {
@@ -10,7 +10,7 @@ export default function Pill({ children, color = "primary", className = "" }: Pi
     primary: "bg-primary-100 text-primary-500",
     green: "bg-green-100 text-green-500",
     red: "bg-red-100 text-red-500",
-    yellow: "bg-yellow-100 text-yellow-500",
+    yellow: "bg-yellow-100 text-yellow-600",
   }
 
   const pillClasses = `

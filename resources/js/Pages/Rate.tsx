@@ -5,7 +5,7 @@ import Modal from "@/Components/Modal";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import Toast from "@/Components/ui/Notification";
-import Pill from "@/Components/ui/Pill";
+import Pill, { PillColor } from "@/Components/ui/Pill";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 import { useState } from "react";
@@ -21,6 +21,7 @@ interface Rate {
 }
 
 export default function Rate({ rates }: { rates: Rate[] }) {
+  console.log(rates)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false)
   const { data, setData, post, patch, delete: destroy, processing, errors, clearErrors, reset } = useForm({
@@ -39,11 +40,13 @@ export default function Rate({ rates }: { rates: Rate[] }) {
       accessor: (rate: Rate) => `${Number(rate.price).toLocaleString()}`,
     },
     {
-      header: "Phòng trống",
+      header: "Phòng còn lại",
       accessor: (rate: Rate) => {
+        var color: PillColor = rate.available_rooms == rate.total_rooms ? 'primary' : (rate.available_rooms == 0 ? 'red' : 'yellow')
+        var text = rate.available_rooms == 0 ? 'Full' : `${rate.available_rooms}/${rate.total_rooms}`
         return (
-          <Pill className="text-sm">
-            {rate.total_rooms}/{rate.total_rooms}
+          <Pill className="text-sm" color={color}>
+            {text}
           </Pill>
         );
       },
@@ -97,12 +100,14 @@ export default function Rate({ rates }: { rates: Rate[] }) {
   }
 
   const deleteRate = (rate: Rate) => {
-    destroy(route("rates.destroy", { rate: rate.id }), {
-      onSuccess: () => {
-        Toast.success("Xóa thành công");
-        reset();
-      }
-    });
+    if (confirm(`Bạn có chắc chắn muốn xóa giá phòng ${rate.room_type}?`)) {
+      destroy(route("rates.destroy", { rate: rate.id }), {
+        onSuccess: () => {
+          Toast.success("Xóa thành công");
+            reset();
+          }
+        });
+    }
   }
 
   return (

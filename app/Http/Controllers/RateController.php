@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Rate;
+use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,10 +12,21 @@ use Inertia\Response;
 class RateController extends Controller
 {
     public function index(): Response {
-      $rates = Rate::orderBy('created_at', 'desc')->get();
-      return Inertia::render('Rate', [
-        'rates' => $rates
-      ]);
+        $rates = Rate::orderBy('created_at', 'desc')->get();
+
+        $roomCounts = Room::selectRaw('rate_id, COUNT(*) as count')
+            ->groupBy('rate_id')
+            ->pluck('count', 'rate_id');
+
+        $finalRates = $rates->map(function ($rate) use ($roomCounts) {
+            $usedRooms = $roomCounts[$rate->id] ?? 0;
+            $rate->available_rooms = max(0, $rate->total_rooms - $usedRooms);
+            return $rate;
+        });
+
+        return Inertia::render('Rate', [
+            'rates' => $finalRates
+        ]);
     }
 
     public function store(Request $request): RedirectResponse {

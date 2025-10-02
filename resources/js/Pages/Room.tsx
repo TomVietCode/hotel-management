@@ -4,7 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import Modal from "@/Components/Modal";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
-import Pill from "@/Components/ui/Pill";
+import Toast from "@/Components/ui/Notification";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { disPlayRoomNumber } from "@/utils";
 import { Head, Link, useForm } from "@inertiajs/react";
@@ -27,6 +27,7 @@ interface Room {
 interface Rate {
   id: number;
   room_type: string;
+  available_rooms: number;
 }
 
 interface Props {
@@ -51,7 +52,7 @@ export default function Room({ rooms, rates, filter }: Props) {
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
   const [customFacility, setCustomFacility] = useState("");
 
-  const { data, setData, post, patch, processing, errors, reset } = useForm({
+  const { data, setData, post, patch, delete: destroy, processing, errors, reset } = useForm({
     id: 0,
     room_number: "",
     bed_type: "single",
@@ -78,7 +79,7 @@ export default function Room({ rooms, rates, filter }: Props) {
     { 
       header: "Tiện ích", 
       accessor: (room: Room) => (
-        <div className="max-w-xs truncate" title={room.facilities}>
+        <div className="max-w-xs " title={room.facilities}>
           {room.facilities || "Không có"}
         </div>
       )
@@ -94,7 +95,7 @@ export default function Room({ rooms, rates, filter }: Props) {
         };
         const status = statusMap[room.status] || { text: room.status, color: "bg-gray-100 text-gray-800" };
         return (
-          <span className={`px-2 py-1 rounded-full text-xs ${status.color}`}>
+          <span className={`px-2 py-1 rounded-full text-sm ${status.color}`}>
             {status.text}
           </span>
         );
@@ -111,18 +112,20 @@ export default function Room({ rooms, rates, filter }: Props) {
     if (!isEdit) {
       post(route("rooms.store"), {
         onSuccess: () => {
+          Toast.success("Thêm phòng thành công");
           reset();
           setSelectedFacilities([]);
           setIsModalOpen(false);
-        }
+        },
       });
     } else {
       patch(route("rooms.update", { room: data.id }), {
         onSuccess: () => {
+          Toast.success("Cập nhật phòng thành công");
           reset();
           setSelectedFacilities([]);
           setIsModalOpen(false);
-        }
+        },
       });
     }
   };
@@ -157,9 +160,15 @@ export default function Room({ rooms, rates, filter }: Props) {
   };
 
   const deleteRoom = (room: Room) => {
-    if (confirm(`Bạn có chắc chắn muốn xóa phòng ${room.room_number}?`)) {
-      // Implement delete logic here
-      console.log("Delete room:", room);
+    if (confirm(`Bạn có chắc chắn muốn xóa phòng ${disPlayRoomNumber(room.room_number, room.floor)}?`)) {
+      destroy(route("rooms.destroy", { room: room.id }), {
+        onSuccess: () => {
+          Toast.success("Xóa phòng thành công");
+        },
+        onError: () => {
+          Toast.error("Xóa phòng thất bại");
+        }
+      });
     }
   };
 
@@ -194,6 +203,7 @@ export default function Room({ rooms, rates, filter }: Props) {
       <div className="mb-6 mx-3">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
+          {/* Filter buttons */}
           <div className="flex gap-4">
             <Link
               href={route('rooms.index')}
@@ -203,7 +213,7 @@ export default function Room({ rooms, rates, filter }: Props) {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              All room({total})
+              Tất cả({total})
             </Link>
             <Link
               href={route('rooms.index', { filter: 'available' })}
@@ -213,7 +223,7 @@ export default function Room({ rooms, rates, filter }: Props) {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              Available room({available})
+              Phòng trống({available})
             </Link>
             <Link
               href={route('rooms.index', { filter: 'booked' })}
@@ -223,16 +233,14 @@ export default function Room({ rooms, rates, filter }: Props) {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              Booked({booked})
+              Phòng đã đặt({booked})
             </Link>
           </div>
+
           <PrimaryButton onClick={openCreateModal}>
             Thêm phòng
           </PrimaryButton>
         </div>
-
-        {/* Filter buttons */}
-
 
         {/* Table */}
         <DataTable
@@ -244,7 +252,7 @@ export default function Room({ rooms, rates, filter }: Props) {
 
         {/* Pagination */}
         {rooms.last_page > 1 && (
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-6 fixed bottom-6 right-4">
             <nav className="flex space-x-2">
               {rooms.links.map((link, index) => (
                 <Link
@@ -284,7 +292,7 @@ export default function Room({ rooms, rates, filter }: Props) {
                 >
                   <option value="" disabled>Chọn loại phòng</option>
                   {rates.map((rate) => (
-                    <option key={rate.id} value={rate.id}>
+                    <option key={rate.id} value={rate.id} disabled={rate.available_rooms == 0}>
                       {rate.room_type}
                     </option>
                   ))}
@@ -349,29 +357,6 @@ export default function Room({ rooms, rates, filter }: Props) {
                 </div>
               </div>
             </div>
-
-            {isEdit && (
-              <div className="mt-4">
-                <InputLabel htmlFor="status" value="Trạng thái" />
-                <select
-                  id="status"
-                  className={`mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm ${
-                    errors.status ? "border-red-500" : ""
-                  }`}
-                  value={data.status}
-                  onChange={(e) => setData("status", e.target.value)}
-                  required
-                >
-                  <option value="available">Trống</option>
-                  <option value="booked">Đã đặt</option>
-                  <option value="reserved">Đã giữ</option>
-                  <option value="blocked">Bị chặn</option>
-                </select>
-                <div className="min-h-5 mt-2">
-                  <InputError message={errors.status} />
-                </div>
-              </div>
-            )}
 
             {/* Tiện ích */}
             <div className="mt-4">
