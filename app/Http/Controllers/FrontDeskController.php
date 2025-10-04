@@ -26,20 +26,6 @@ class FrontDeskController extends Controller
             ->orWhereBetween('check_out_date', [$startDate, $endDate])
             ->get();
 
-        // Get booking counts by status
-        $bookingCounts = [
-            'due_in' => Booking::whereDate('check_in_date', $currentDate)
-                ->whereIn('status', ['confirmed', 'pending'])
-                ->count(),
-            'checked_out' => Booking::whereDate('actual_check_out', $currentDate)
-                ->where('status', 'checked_out')
-                ->count(),
-            'due_out' => Booking::whereDate('check_out_date', $currentDate)
-                ->where('status', 'checked_in')
-                ->count(),
-            'checked_in' => Booking::where('status', 'checked_in')->count(),
-        ];
-
         // Generate calendar data for 12 months
         $calendarData = [];
         for ($i = 0; $i < 12; $i++) {
@@ -59,8 +45,9 @@ class FrontDeskController extends Controller
                         'id' => $booking->id,
                         'guest_name' => $booking->guest->full_name,
                         'room_number' => $booking->room->room_number,
-                        'check_in' => $booking->check_in_date->format('Y-m-d'),
-                        'check_out' => $booking->check_out_date->format('Y-m-d'),
+                        'floor' => $booking->room->floor,
+                        'check_in' => $booking->check_in_date->format('d-m-Y'),
+                        'check_out' => $booking->check_out_date->format('d-m-Y'),
                         'status' => $booking->status,
                         'start_day' => max(1, $booking->check_in_date >= $monthStart ? $booking->check_in_date->day : 1),
                         'duration' => $booking->nights,
@@ -70,9 +57,7 @@ class FrontDeskController extends Controller
         }
 
         return Inertia::render('FrontDesk/Index', [
-            'bookingCounts' => $bookingCounts,
             'calendarData' => $calendarData,
-            'currentMonth' => $currentDate->format('M'),
         ]);
     }
 
