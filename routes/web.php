@@ -2,17 +2,16 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RateController;
-use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+  if (Auth::check()) {
+      return redirect()->route('dashboard');
+  } else {
+      return redirect()->route('login');
+  }
 });
 
 Route::get('/dashboard', function () {
@@ -32,6 +31,10 @@ Route::middleware('auth')->group(function () {
     
     // Rooms
     Route::resource('rooms', \App\Http\Controllers\RoomController::class);
+    
+    // Front Desk
+    Route::get('/front-desk', [\App\Http\Controllers\FrontDeskController::class, 'index'])->name('front-desk.index');
+    Route::get('/front-desk/bookings/{status}', [\App\Http\Controllers\FrontDeskController::class, 'getBookingsByStatus'])->name('front-desk.bookings');
 });
 
 require __DIR__.'/auth.php';

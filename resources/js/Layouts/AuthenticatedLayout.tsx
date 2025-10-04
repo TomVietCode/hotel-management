@@ -8,7 +8,7 @@ export default function Authenticated({
   header,
   children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-  const user = usePage().props.auth.user;
+  const user = usePage<any>().props.auth.user;
   return (
     <div className="min-h-screen bg-gray-100">
       <ToastContainer />
@@ -103,11 +103,11 @@ export default function Authenticated({
               <span className="ml-3">Trang chủ</span>
             </Link>
 
-            {/* Bookings */}
+            {/* Front Desk */}
             <Link
-              href="/bookings"
+              href={route("front-desk.index")}
               className={`flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 ${
-                route().current("bookings.index")
+                route().current("front-desk.*")
                   ? "bg-primary-50 text-primary-600"
                   : "hover:bg-primary-50 hover:text-primary-600"
               }`}
@@ -126,7 +126,7 @@ export default function Authenticated({
                   d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2v0zm16 0v1.5a.5.5 0 01-.5.5h-1a.5.5 0 01-.5-.5V7h2zM7 7v1.5a.5.5 0 01-.5.5h-1a.5.5 0 01-.5-.5V7h2z"
                 />
               </svg>
-              <span className="ml-3">Lễ tân</span>
+              <span className="ml-3">Đặt phòng</span>
             </Link>
 
             {/* Guests */}
@@ -211,6 +211,5 @@ export default function Authenticated({
       </div>
       <main className="ml-64 mt-5 pl-2 py-2">{children}</main>
     </div>
-    
   );
 }
