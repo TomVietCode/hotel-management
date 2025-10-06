@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\FrontDeskController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RateController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,11 +32,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/rates/{rate}', [RateController::class, 'destroy'])->name('rates.destroy');
     
     // Rooms
-    Route::resource('rooms', \App\Http\Controllers\RoomController::class);
+    Route::resource('rooms', RoomController::class);
     
     // Front Desk
-    Route::get('/front-desk', [\App\Http\Controllers\FrontDeskController::class, 'index'])->name('front-desk.index');
-    Route::get('/front-desk/bookings/{status}', [\App\Http\Controllers\FrontDeskController::class, 'getBookingsByStatus'])->name('front-desk.bookings');
+    Route::get('/front-desk', [FrontDeskController::class, 'index'])->name('front-desk.index');
+    Route::get('/front-desk/bookings/{status}', [FrontDeskController::class, 'getBookingsByStatus'])->name('front-desk.bookings');
+    Route::get('/front-desk/create-booking', [FrontDeskController::class, 'createBooking']);
 });
 
 require __DIR__.'/auth.php';

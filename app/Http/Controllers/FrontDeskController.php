@@ -91,4 +91,9 @@ class FrontDeskController extends Controller
 
         return response()->json($bookings);
     }
+
+    public function createBooking()
+    {
+        return Inertia::render('FrontDesk/CreateBooking');
+    }
 }
