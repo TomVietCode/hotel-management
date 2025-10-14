@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Guest;
+use App\Models\Rate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
@@ -94,6 +96,122 @@ class FrontDeskController extends Controller
 
     public function createBooking()
     {
-        return Inertia::render('FrontDesk/CreateBooking');
+        $rates = Rate::all();
+
+        return Inertia::render('FrontDesk/CreateBooking', [
+          'rates' => $rates
+        ]);
+    }
+
+    /**
+     * Search for available rooms based on criteria
+     */
+    public function searchRooms(Request $request)
+    {
+        $request->validate([
+            'check_in' => 'required|date',
+            'check_out' => 'required|date|after:check_in',
+            'bed_type' => 'nullable|string',
+            'rate_id' => 'nullable|integer|exists:rates,id',
+            'status' => 'required|in:all,available'
+        ]);
+
+        $query = Room::with('rate');
+
+        // Filter by bed type if specified
+        if ($request->bed_type) {
+            $query->where('bed_type', $request->bed_type);
+        }
+
+        // Filter by rate (room type) if specified
+        if ($request->rate_id) {
+            $query->where('rate_id', $request->rate_id);
+        }
+
+        // Filter by availability if requested
+        if ($request->status === 'available') {
+            $checkIn = Carbon::parse($request->check_in);
+            $checkOut = Carbon::parse($request->check_out);
+
+            // Get rooms that don't have conflicting bookings
+            $bookedRoomIds = Booking::where(function ($q) use ($checkIn, $checkOut) {
+                $q->where(function ($subQ) use ($checkIn, $checkOut) {
+                    $subQ->whereBetween('check_in_date', [$checkIn, $checkOut])
+                        ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
+                        ->orWhere(function ($innerQ) use ($checkIn, $checkOut) {
+                            $innerQ->where('check_in_date', '<=', $checkIn)
+                                ->where('check_out_date', '>=', $checkOut);
+                        });
+                });
+            })->whereIn('status', ['confirmed', 'checked_in', 'pending'])
+                ->pluck('room_id');
+
+            $query->whereNotIn('id', $bookedRoomIds)
+                ->where('status', 'available');
+        }
+
+        $rooms = $query->get();
+
+        return response()->json($rooms);
+    }
+
+    /**
+     * Store a new booking
+     */
+    public function storeBooking(Request $request)
+    {
+        $request->validate([
+            'guest.full_name' => 'required|string|max:255',
+            'guest.email' => 'required|email|max:255',
+            'guest.phone' => 'required|string|max:20',
+            'guest.id_number' => 'required|string|max:20',
+            'guest.gender' => 'required|in:male,female',
+            'guest.date_of_birth' => 'required|date',
+            'room_id' => 'required|integer|exists:rooms,id',
+            'check_in_date' => 'required|date',
+            'check_out_date' => 'required|date|after:check_in_date',
+            'booking_code' => 'required|string|unique:bookings,booking_code',
+            'total_amount' => 'required|numeric|min:0',
+            'adults' => 'integer|min:1|max:10',
+            'children' => 'integer|min:0|max:10',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Create or find guest
+            $guest = Guest::firstOrCreate(
+                ['email' => $request->guest['email']],
+                $request->guest
+            );
+
+            // Update room status to booked
+            $room = Room::findOrFail($request->room_id);
+            $room->update(['status' => 'booked']);
+
+            // Create booking
+            $booking = Booking::create([
+                'booking_code' => $request->booking_code,
+                'guest_id' => $guest->id,
+                'room_id' => $request->room_id,
+                'check_in_date' => $request->check_in_date,
+                'check_out_date' => $request->check_out_date,
+                'status' => 'confirmed',
+                'adults' => $request->adults ?? 1,
+                'children' => $request->children ?? 0,
+                'total_amount' => $request->total_amount,
+                'paid_amount' => 0,
+                'special_requests' => $request->special_requests,
+                'notes' => $request->notes,
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Đặt phòng thành công!');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->withErrors(['error' => 'Đặt phòng thất bại: ' . $e->getMessage()]);
+        }
     }
 }

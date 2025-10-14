@@ -21,7 +21,6 @@ interface Rate {
 }
 
 export default function Rate({ rates }: { rates: Rate[] }) {
-  console.log(rates)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false)
   const { data, setData, post, patch, delete: destroy, processing, errors, clearErrors, reset } = useForm({

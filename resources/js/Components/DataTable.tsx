@@ -17,8 +17,8 @@ interface DataTableProps<T extends { id: number | string }> {
   data: T[];
   columns: Column<T>[];
   onRowClick?: (row: T) => void;
-  onEdit: (row: T) => void;
-  onDelete: (row: T) => void;
+  onEdit?: (row: T) => void;
+  onDelete?: (row: T) => void;
 }
 
 export default function DataTable<T extends { id: number | string }>({
@@ -44,7 +44,9 @@ export default function DataTable<T extends { id: number | string }>({
                 {column.header}
               </th>
             ))}
-            <th className="px-2 py-3 font-medium text-sm w-32">Thao tác</th>
+            {(onEdit || onDelete) && (
+              <th className="px-2 py-3 font-medium text-sm w-32">Thao tác</th>
+            )}
           </tr>
         </thead>
 
@@ -53,7 +55,8 @@ export default function DataTable<T extends { id: number | string }>({
           {data.map((row, rowIndex) => (
             <tr
               key={rowIndex}
-              className="bg-gray-50 border border-primary-50 cursor-pointer hover:bg-gray-100"
+              className={`bg-gray-50 border border-primary-50 hover:bg-gray-100 ${onRowClick ? 'cursor-pointer' : ''}`}
+              onClick={() => onRowClick?.(row)}
             >
               {columns.map((column, colIndex) => (
                 <td
@@ -66,39 +69,45 @@ export default function DataTable<T extends { id: number | string }>({
                 </td>
               ))}
 
-              <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <FontAwesomeIcon
-                      icon={faEllipsisVertical}
-                      className="size-5 cursor-pointer text-gray-600 hover:text-gray-800"
-                    />
-                  </Dropdown.Trigger>
-                  <Dropdown.Content
-                    align="right"
-                    width="28"
-                    contentClasses="py-1 bg-white"
-                  >
-                    <button
-                      className="block w-full px-4 py-2 text-start text-sm leading-5 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-primary-600"
-                      onClick={() => onEdit(row)}
-                    >
+              {(onEdit || onDelete) && (
+                <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                  <Dropdown>
+                    <Dropdown.Trigger>
                       <FontAwesomeIcon
-                        icon={faPenToSquare}
-                        className="mr-2 size-3"
+                        icon={faEllipsisVertical}
+                        className="size-5 cursor-pointer text-gray-600 hover:text-gray-800"
                       />
-                      Sửa
-                    </button>
-                    <button
-                      className="block w-full px-4 py-2 text-start text-sm leading-5 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-red-600"
-                      onClick={() => onDelete(row)}
+                    </Dropdown.Trigger>
+                    <Dropdown.Content
+                      align="right"
+                      width="28"
+                      contentClasses="py-1 bg-white"
                     >
-                      <FontAwesomeIcon icon={faTrash} className="mr-2 size-3" />
-                      Xoá
-                    </button>
-                  </Dropdown.Content>
-                </Dropdown>
-              </td>
+                      {onEdit && (
+                        <button
+                          className="block w-full px-4 py-2 text-start text-sm leading-5 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-primary-600"
+                          onClick={() => onEdit(row)}
+                        >
+                          <FontAwesomeIcon
+                            icon={faPenToSquare}
+                            className="mr-2 size-3"
+                          />
+                          Sửa
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          className="block w-full px-4 py-2 text-start text-sm leading-5 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-red-600"
+                          onClick={() => onDelete(row)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="mr-2 size-3" />
+                          Xoá
+                        </button>
+                      )}
+                    </Dropdown.Content>
+                  </Dropdown>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
