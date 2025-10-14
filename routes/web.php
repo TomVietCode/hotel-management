@@ -37,9 +37,7 @@ Route::middleware('auth')->group(function () {
     // Front Desk
     Route::get('/front-desk', [FrontDeskController::class, 'index'])->name('front-desk.index');
     Route::get('/front-desk/bookings/{status}', [FrontDeskController::class, 'getBookingsByStatus'])->name('front-desk.bookings');
-    Route::get('/front-desk/create-booking', [FrontDeskController::class, 'createBooking'])->name('front-desk.create-booking');
-    Route::post('/front-desk/search-rooms', [FrontDeskController::class, 'searchRooms'])->name('front-desk.search-rooms');
-    Route::post('/front-desk/store-booking', [FrontDeskController::class, 'storeBooking'])->name('front-desk.store-booking');
+    Route::get('/front-desk/create-booking', [FrontDeskController::class, 'createBooking']);
 });
 
 require __DIR__.'/auth.php';

@@ -1,67 +1,12 @@
-import { Rate, Room, RoomSearchCriteria as SearchCriteria } from "@/types/interfaces";
 import PrimaryButton from "../PrimaryButton";
-import { useState } from "react";
-import { router } from "@inertiajs/react";
 
-interface RoomSearchCriteriaProps {
-  rates: Rate[];
-  onSearchResults: (rooms: Room[], searchCriteria: SearchCriteria) => void;
-}
-
-export default function RoomSearchCriteria({ rates, onSearchResults }: RoomSearchCriteriaProps) {
-  const [isSearching, setIsSearching] = useState(false);
-  const [formData, setFormData] = useState<SearchCriteria>({
-    bed_type: '',
-    rate_id: '',
-    check_in: '',
-    check_out: '',
-    status: 'available'
-  });
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.check_in || !formData.check_out) {
-      alert('Vui lòng chọn ngày check-in và check-out');
-      return;
-    }
-
-    setIsSearching(true);
-    
-    try {
-      const response = await fetch(route('front-desk.search-rooms'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const rooms = await response.json();
-        onSearchResults(rooms, formData);
-      } else {
-        console.error('Search failed');
-        onSearchResults([], formData);
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      onSearchResults([], formData);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleInputChange = (field: keyof SearchCriteria, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
+export default function RoomSearchCriteria() {
   return (
     <div className="py-1">
       <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="overflow-hidden bg-white shadow-md sm:rounded-lg">
           <div className="p-6 text-gray-900">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form className="space-y-4">
               <div className="grid grid-cols-2 gap-5">
                 <div className="flex flex-col gap-3">
                   {/* Bed type */}
@@ -75,8 +20,6 @@ export default function RoomSearchCriteria({ rates, onSearchResults }: RoomSearc
                     <select
                       id="bed_type"
                       name="bed_type"
-                      value={formData.bed_type}
-                      onChange={(e) => handleInputChange('bed_type', e.target.value)}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                     >
                       <option value="">Chọn loại giường</option>
@@ -97,12 +40,10 @@ export default function RoomSearchCriteria({ rates, onSearchResults }: RoomSearc
                     <select
                       id="rate_id"
                       name="rate_id"
-                      value={formData.rate_id}
-                      onChange={(e) => handleInputChange('rate_id', e.target.value)}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                     >
                       <option value="">Chọn loại phòng</option>
-                      {rates.map(rate => <option key={rate.id} value={rate.id}>{rate.room_type}</option>)}
+                      {/* Đây sẽ là danh sách các loại phòng từ API */}
                     </select>
                   </div>
 
@@ -124,10 +65,7 @@ export default function RoomSearchCriteria({ rates, onSearchResults }: RoomSearc
                         type="date"
                         id="check_in"
                         name="check_in"
-                        value={formData.check_in}
-                        onChange={(e) => handleInputChange('check_in', e.target.value)}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                        required
                       />
                     </div>
 
@@ -143,10 +81,7 @@ export default function RoomSearchCriteria({ rates, onSearchResults }: RoomSearc
                         type="date"
                         id="check_out"
                         name="check_out"
-                        value={formData.check_out}
-                        onChange={(e) => handleInputChange('check_out', e.target.value)}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                        required
                       />
                     </div>
                   </div>
@@ -159,8 +94,6 @@ export default function RoomSearchCriteria({ rates, onSearchResults }: RoomSearc
                             type="radio"
                             name="status"
                             value="all"
-                            checked={formData.status === 'all'}
-                            onChange={(e) => handleInputChange('status', e.target.value as 'all' | 'available')}
                             className="border-gray-300 text-primary-600 focus:ring-primary-500"
                           />
                           <span className="ms-2 text-sm">Tất cả</span>
@@ -172,8 +105,6 @@ export default function RoomSearchCriteria({ rates, onSearchResults }: RoomSearc
                             type="radio"
                             name="status"
                             value="available"
-                            checked={formData.status === 'available'}
-                            onChange={(e) => handleInputChange('status', e.target.value as 'all' | 'available')}
                             className="border-gray-300 text-primary-600 focus:ring-primary-500"
                           />
                           <span className="ms-2 text-sm">
@@ -182,8 +113,8 @@ export default function RoomSearchCriteria({ rates, onSearchResults }: RoomSearc
                         </label>
                       </div>
                     </div>
-                    <PrimaryButton type="submit" className="font-light" disabled={isSearching}>
-                      {isSearching ? 'Đang tìm...' : 'Tìm phòng'}
+                    <PrimaryButton type="submit" className="font-light">
+                      Tìm phòng
                     </PrimaryButton>
                   </div>
                 </div>
