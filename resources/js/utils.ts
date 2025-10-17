@@ -33,7 +33,7 @@ export function calculateDay(checkIn: string, checkOut: string) {
   )
 }
 
-export function calculateTotalAmount(price: number, checkIn: string, checkOut: string) {
+export function calculateTotalAmount(price: number, checkIn: string, checkOut: string): { display: string, value: number} {
   const days = calculateDay(checkIn, checkOut);
   const totalAmount = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -44,9 +44,38 @@ export function calculateTotalAmount(price: number, checkIn: string, checkOut: s
 
 export function generateBookingCode(length: number) {
   const characters = '0123456789';
-  let result = '';
+  let result = '#';
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
 }
+
+export const getStatusText = (status: string) => {
+  const statusMap: Record<string, string> = {
+    confirmed: "Chưa Check-in",
+    checked_in: "Đã Check-in",
+    checked_out: "Đã Check-out",
+    late_out: "Quá hạn",
+  };
+  return statusMap[status] || status;
+};
+
+export const getStatusColor = (status: string) => {
+  const colorMap: Record<string, string> = {
+    confirmed: "bg-primary-50 text-primary-400",
+    checked_in: "bg-success-50 text-success-400",
+    checked_out: "bg-warning-50 text-warning-400",
+    late_out: "bg-danger-50 text-danger-400",
+  };
+  return colorMap[status] || "bg-gray-100 text-gray-800";
+};
+
+export const getBedTypeText = (bedType: string) => {
+  const bedTypeMap: Record<string, string> = {
+    single: "Giường đơn",
+    double: "Giường đôi",
+    triple: "Ba giường",
+  };
+  return bedTypeMap[bedType] || bedType;
+};

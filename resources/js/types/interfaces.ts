@@ -33,19 +33,31 @@ export interface Guest {
 export interface Booking {
   id?: number;
   booking_code: string;
-  guest_id: number;
-  room_id: number;
+  guest: Guest;
+  room: Room;
   check_in_date: string;
   check_out_date: string;
   actual_check_in?: string;
   actual_check_out?: string;
   status: string;
-  adults: number;
-  children: number;
   total_amount: number;
-  paid_amount: number;
-  special_requests?: string;
   notes?: string;
+}
+
+export interface GuestBookingData {
+  id: number;
+  booking_code: string;
+  guest_name: string;
+  guest_phone: string;
+  room_number: string;
+  room_type: string;
+  bed_type: string;
+  check_in_date: string;
+  check_out_date: string;
+  nights: number;
+  total_amount: number;
+  status: string;
+  raw_status: string;
 }
 
 export interface RoomSearchCriteria {

@@ -52,7 +52,7 @@ export default function DataTable<T extends { id: number | string }>({
 
         {/* Table body */}
         <tbody>
-          {data.map((row, rowIndex) => (
+          {data.length > 0 ? data.map((row, rowIndex) => (
             <tr
               key={rowIndex}
               className="bg-gray-50 border border-primary-50 cursor-pointer hover:bg-gray-100"
@@ -107,7 +107,11 @@ export default function DataTable<T extends { id: number | string }>({
                 </td>
               )}
             </tr>
-          ))}
+          )) : (
+            <tr>
+              <td colSpan={columns.length + 1} className="px-6 py-4 text-center">Không có dữ liệu</td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

@@ -18,18 +18,22 @@ export default function CreateBooking({
   searchResults,
   searchCriteria = {},
 }: Props) {
+  // get data form url queries
+  const searchParams = new URLSearchParams(window.location.search);
+  const checkInDate = searchParams.get('check_in_date');
+  const checkOutDate = searchParams.get('check_out_date');
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>({});
   const handleRowClick = (room: Room) => {
     if(room.status == "booked") {
       return
     }
     setData({ 
       room: room,
-      check_in_date: searchCriteria.check_in_date,
-      check_out_date: searchCriteria.check_out_date,
+      check_in_date: searchCriteria.check_in_date || checkInDate,
+      check_out_date: searchCriteria.check_out_date || checkOutDate,
     })
-    setIsBookingModalOpen(true);
+    room.id && setIsBookingModalOpen(true);
   }
   return (
     <AuthenticatedLayout>

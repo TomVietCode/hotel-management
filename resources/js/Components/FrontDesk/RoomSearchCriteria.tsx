@@ -13,8 +13,8 @@ export default function RoomSearchCriteria({ rates , searchCriteria }: Props) {
   const [formData, setFormData] = useState({
     bed_type: searchCriteria.bed_type || '',
     rate_id: searchCriteria.rate_id || '',
-    check_in_date: searchCriteria.check_in || '',
-    check_out_date: searchCriteria.check_out || '',
+    check_in_date: searchCriteria.check_in_date || '',
+    check_out_date: searchCriteria.check_out_date || '',
     status: searchCriteria.status || 'available',
   })
 

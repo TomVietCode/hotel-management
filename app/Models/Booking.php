@@ -17,11 +17,7 @@ class Booking extends Model
         'actual_check_in',
         'actual_check_out',
         'status',
-        'adults',
-        'children',
         'total_amount',
-        'paid_amount',
-        'special_requests',
         'notes',
     ];
 
@@ -31,7 +27,6 @@ class Booking extends Model
         'actual_check_in' => 'datetime',
         'actual_check_out' => 'datetime',
         'total_amount' => 'decimal:2',
-        'paid_amount' => 'decimal:2',
     ];
 
     /**
@@ -80,5 +75,25 @@ class Booking extends Model
     public function isDueOut(): bool
     {
         return $this->check_out_date->isToday() && $this->status === 'checked_in';
+    }
+
+    /**
+     * Check if booking is late for check-out (past checkout date but still checked in)
+     */
+    public function isLateOut(): bool
+    {
+        return $this->check_out_date->isPast() && $this->status === 'checked_in';
+    }
+
+    /**
+     * Get the display status for the booking
+     */
+    public function getDisplayStatus(): string
+    {
+        if ($this->isLateOut()) {
+            return 'late_out';
+        }
+        
+        return $this->status;
     }
 }

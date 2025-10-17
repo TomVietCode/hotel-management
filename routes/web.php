@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FrontDeskController;
+use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RateController;
 use App\Http\Controllers\RoomController;
@@ -40,6 +41,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/front-desk/create-booking', [FrontDeskController::class, 'createBooking'])->name('front-desk.create-booking');
     Route::post('/front-desk/create-booking', [FrontDeskController::class, 'storeBooking'])->name('front-desk.store-booking');
     Route::get('/front-desk/search-rooms', [FrontDeskController::class, 'searchRooms'])->name('front-desk.search-rooms');
+    
+    // Guest Management
+    Route::get('/guest', [GuestController::class, 'index'])->name('guest.index');
+    Route::patch('/guest/{booking}/check-in', [GuestController::class, 'checkIn'])->name('guest.check-in');
+    Route::patch('/guest/{booking}/check-out', [GuestController::class, 'checkOut'])->name('guest.check-out');
 });
 
 require __DIR__.'/auth.php';

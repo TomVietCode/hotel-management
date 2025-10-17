@@ -131,7 +131,7 @@ export default function Authenticated({
 
             {/* Guests */}
             <Link
-              href="/guest"
+              href={route("guest.index")}
               className={`flex items-center rounded-lg px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 ${
                 route().current("guest.index")
                   ? "bg-primary-50 text-primary-600"

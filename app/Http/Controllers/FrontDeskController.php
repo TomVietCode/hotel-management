@@ -184,11 +184,7 @@ class FrontDeskController extends Controller
               'check_in_date' => $request->check_in_date,
               'check_out_date' => $request->check_out_date,
               'status' => 'confirmed',
-              'adults' => $request->adults ?? 1,
-              'children' => $request->children ?? 0,
               'total_amount' => $request->total_amount,
-              'paid_amount' => 0,
-              'special_requests' => $request->special_requests,
               'notes' => $request->notes,
             ]);
 

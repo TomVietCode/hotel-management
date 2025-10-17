@@ -7,6 +7,7 @@ import InputError from "../InputError";
 import PrimaryButton from "../PrimaryButton";
 import { useForm } from "@inertiajs/react";
 import Toast from "../ui/Notification";
+import { useEffect } from "react";
 
 export default function CreateBookingModal({
   isBookingModalOpen,
@@ -17,7 +18,6 @@ export default function CreateBookingModal({
   setIsBookingModalOpen: (value: boolean) => void;
   data: any
 }) {
-  const room = data?.room
   const {
     data: guestData,
     setData: setGuestData,
@@ -48,9 +48,18 @@ export default function CreateBookingModal({
     total_amount: 0,
   });
 
+  useEffect(() => {
+    if (data) {
+      setGuestData('room_id', data.room?.id)
+      setGuestData('total_amount', calculateTotalAmount(data.room?.rate?.price || 0, data.check_in_date, data.check_out_date).value)
+      setGuestData('check_in_date', data.check_in_date)
+      setGuestData('check_out_date', data.check_out_date)
+    }
+  }, [data]);
+
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log(guestData)
+    
     post(route('front-desk.store-booking'), {
       onSuccess: (response) => {
         Toast.success('Tạo booking thành công!');
@@ -72,8 +81,8 @@ export default function CreateBookingModal({
       <form className="p-6" onSubmit={handleBookingSubmit}>
         <h2 className="text-lg font-medium text-gray-900 mb-6">
           Đặt phòng{" "}
-          {room &&
-            disPlayRoomNumber(room.room_number, room.floor)}
+          {data.room &&
+            disPlayRoomNumber(data.room.room_number, data.room.floor)}
         </h2>
 
         {/* Main Content Grid */}
@@ -83,15 +92,15 @@ export default function CreateBookingModal({
             <h3 className="font-medium text-gray-900 mb-4">
               Thông tin đặt phòng
             </h3>
-            {room && (
+            {data.room && (
               <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
                 <div className="grid grid-cols-1 gap-3 text-sm">
                   <div className="flex justify-between">
                     <span className="font-medium text-gray-600">Phòng:</span>
                     <span className="font-semibold">
                       {disPlayRoomNumber(
-                        room.room_number,
-                        room.floor
+                        data.room.room_number,
+                        data.room.floor
                       )}
                     </span>
                   </div>
@@ -99,16 +108,16 @@ export default function CreateBookingModal({
                     <span className="font-medium text-gray-600">
                       Loại phòng:
                     </span>
-                    <span>{room.rate?.room_type}</span>
+                    <span >{data.room.rate?.room_type}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium text-gray-600">
                       Loại giường:
                     </span>
                     <span>
-                      {room.bed_type === "single"
+                      {data.room.bed_type === "single"
                         ? "Giường đơn"
-                        : room.bed_type === "double"
+                        : data.room.bed_type === "double"
                         ? "Giường đôi"
                         : "Ba giường"}
                     </span>
@@ -144,14 +153,14 @@ export default function CreateBookingModal({
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
                         currency: "VND",
-                      }).format(room.rate?.price || 0)}
+                      }).format(data.room.rate?.price || 0)}
                     </span>
                   </div>
                   <hr className="border-gray-300" />
                   <div className="flex justify-between">
                     <span className="font-bold text-gray-800">Tổng tiền:</span>
                     <span className="text-lg font-bold text-primary-600">
-                      {calculateTotalAmount(room.rate?.price || 0, data.check_in_date, data.check_out_date).display}
+                      {calculateTotalAmount(data.room.rate?.price || 0, data.check_in_date, data.check_out_date).display}
                     </span>
                   </div>
                 </div>
