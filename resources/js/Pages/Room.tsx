@@ -52,6 +52,56 @@ const defaultFacilities = [
   "Ban công",
 ];
 
+export const roomColumns: Column<Room>[] = [
+  {
+    header: "Số phòng",
+    accessor: (room: Room) => disPlayRoomNumber(room.room_number, room.floor),
+  },
+  {
+    header: "Loại giường",
+    accessor: (room: Room) => {
+      const bedTypeMap: Record<string, string> = {
+        single: "Giường đơn",
+        double: "Giường đôi",
+        triple: "Ba giường",
+      };
+      return bedTypeMap[room.bed_type] || room.bed_type;
+    },
+  },
+  { header: "Tầng", accessor: "floor" },
+  {
+    header: "Tiện ích",
+    accessor: (room: Room) => (
+      <div className="max-w-xs " title={room.facilities}>
+        {room.facilities || "Không có"}
+      </div>
+    ),
+  },
+  {
+    header: "Trạng thái",
+    accessor: (room: Room) => {
+      const statusMap: Record<string, { text: string; color: string }> = {
+        available: { text: "Trống", color: "bg-green-100 text-green-800" },
+        booked: { text: "Đã đặt", color: "bg-red-100 text-red-800" },
+        reserved: { text: "Đã giữ", color: "bg-yellow-100 text-yellow-800" },
+        blocked: {
+          text: "Không khả dụng",
+          color: "bg-gray-100 text-gray-800",
+        },
+      };
+      const status = statusMap[room.status] || {
+        text: room.status,
+        color: "bg-gray-100 text-gray-800",
+      };
+      return (
+        <span className={`px-2 py-1 rounded-full text-sm ${status.color}`}>
+          {status.text}
+        </span>
+      );
+    },
+  },
+];
+
 export default function Room({ rooms, rates, filter }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -77,55 +127,7 @@ export default function Room({ rooms, rates, filter }: Props) {
     status: "available",
   });
 
-  const columns: Column<Room>[] = [
-    {
-      header: "Số phòng",
-      accessor: (room: Room) => disPlayRoomNumber(room.room_number, room.floor),
-    },
-    {
-      header: "Loại giường",
-      accessor: (room: Room) => {
-        const bedTypeMap: Record<string, string> = {
-          single: "Giường đơn",
-          double: "Giường đôi",
-          triple: "Ba giường",
-        };
-        return bedTypeMap[room.bed_type] || room.bed_type;
-      },
-    },
-    { header: "Tầng", accessor: "floor" },
-    {
-      header: "Tiện ích",
-      accessor: (room: Room) => (
-        <div className="max-w-xs " title={room.facilities}>
-          {room.facilities || "Không có"}
-        </div>
-      ),
-    },
-    {
-      header: "Trạng thái",
-      accessor: (room: Room) => {
-        const statusMap: Record<string, { text: string; color: string }> = {
-          available: { text: "Trống", color: "bg-green-100 text-green-800" },
-          booked: { text: "Đã đặt", color: "bg-red-100 text-red-800" },
-          reserved: { text: "Đã giữ", color: "bg-yellow-100 text-yellow-800" },
-          blocked: {
-            text: "Không khả dụng",
-            color: "bg-gray-100 text-gray-800",
-          },
-        };
-        const status = statusMap[room.status] || {
-          text: room.status,
-          color: "bg-gray-100 text-gray-800",
-        };
-        return (
-          <span className={`px-2 py-1 rounded-full text-sm ${status.color}`}>
-            {status.text}
-          </span>
-        );
-      },
-    },
-  ];
+
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -283,7 +285,7 @@ export default function Room({ rooms, rates, filter }: Props) {
         {/* Table */}
         <DataTable
           data={rooms.data}
-          columns={columns}
+          columns={roomColumns}
           onEdit={editRoom}
           onDelete={deleteRoom}
         />

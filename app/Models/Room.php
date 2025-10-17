@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
@@ -23,5 +24,9 @@ class Room extends Model
     public function rate()
     {
         return $this->belongsTo(Rate::class);
+    }
+
+    public function bookings(): HasMany {
+      return $this->hasMany(Booking::class);
     }
 }
