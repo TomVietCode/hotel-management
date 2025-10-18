@@ -13,9 +13,8 @@ services:
     composer install --no-dev --optimize-autoloader --no-interaction
     npm ci
     npm run build
-    php artisan storage:link
   
-  run_command: "vendor/bin/heroku-php-apache2 -C apache_app.conf public/"
+  run_command: "vendor/bin/heroku-php-apache2 public/"
   
   environment_slug: php
   instance_count: 1
@@ -26,6 +25,8 @@ services:
   routes:
   - path: /
   
+  # ❌ KHÔNG ĐỂ PASSWORD Ở ĐÂY!
+  # Thay vào đó, dùng ${VARIABLE_NAME} để reference từ environment variables
   envs:
   - key: APP_NAME
     value: "Novotel"
@@ -41,20 +42,18 @@ services:
   - key: DB_CONNECTION
     value: "mysql"
   - key: DB_HOST
-    value: "mysql-ba70289-hanflorist-634a.l.aivencloud.com"
+    value: "${hotel-db.HOSTNAME}"
   - key: DB_PORT
-    value: "22123"
+    value: "${hotel-db.PORT}"
   - key: DB_DATABASE
-    value: "hotel-management-db"
+    value: "${hotel-db.DATABASE}"
   - key: DB_USERNAME
-    value: "avnadmin"
+    value: "${hotel-db.USERNAME}"
   - key: DB_PASSWORD
-    value: "AVNS_Tx3NiZ76Gyi-DbBIMT5"
+    value: "${hotel-db.PASSWORD}"
   - key: SESSION_DRIVER
     value: "database"
   - key: CACHE_STORE
-    value: "database"
-  - key: QUEUE_CONNECTION
     value: "database"
 
 databases:
