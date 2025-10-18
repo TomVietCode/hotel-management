@@ -44,7 +44,7 @@ networks:
   novotel-network:
     driver: bridge
 
-volume:
+volumes:
   certbot_certs:
   certbot_webroot:
 
