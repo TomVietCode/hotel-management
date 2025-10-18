@@ -1,0 +1,36 @@
+version: '3.8'
+
+services: 
+  # 1. Service for PHP-FPM (Laravel app)
+  app:
+    build: 
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: novotel
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - novotel-network
+  
+  # 2.Service for web server (Nginx)
+  nginx: 
+    image: nginx:alpine
+    container_name: hotel-nginx
+    restart: unless-stopped
+    ports:
+      -"80:80"
+    volumes:
+      - ./:var/www/html
+      - ./docker/nginx.conf:/etc/nginx/con.d/default.conf
+    depends_on: 
+      - app
+    networks:
+      - novotel-network
+
+networks:
+  novotel-network:
+    driver: bridge
+
+
