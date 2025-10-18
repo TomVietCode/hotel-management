@@ -83,7 +83,7 @@ export default function Dashboard({ keyMetrics, charts, popularRoomTypes, recent
             />
 
             <MetricCard
-              title="Tổng booking"
+              title="Tổng booking tháng"
               value={keyMetrics.totalBookings}
               color="purple"
               icon={
@@ -94,7 +94,7 @@ export default function Dashboard({ keyMetrics, charts, popularRoomTypes, recent
             />
 
             <MetricCard
-              title="Tổng doanh thu"
+              title="Doanh thu tháng"
               value={new Intl.NumberFormat('vi-VN', {
                 style: 'currency',
                 currency: 'VND'

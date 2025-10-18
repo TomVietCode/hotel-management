@@ -22,8 +22,8 @@ class DashboardController extends Controller
         // Key Metrics
         $totalRooms = Room::count();
         $totalGuests = Guest::count();
-        $totalBookings = Booking::count();
-        $totalRevenue = Booking::where('status', 'checked_out')->sum('total_amount');
+        $totalBookings = Booking::whereYear('check_out_date', Carbon::now()->year)->whereMonth('check_out_date', Carbon::now()->month)->count();
+        $totalRevenue = Booking::whereYear('check_out_date', Carbon::now()->year)->whereMonth('check_out_date', Carbon::now()->month)->where('status', 'checked_out')->sum('total_amount');
 
         // Current Status
         $availableRooms = Room::where('status', 'available')->count();
