@@ -41,10 +41,16 @@ class RoomController extends Controller
             return $rate;
         });
 
+        $count = [
+          'all' => Room::count(),
+          'available' => Room::where('status', 'available')->count(),
+          'booked' => Room::whereIn('status', ['booked', 'reserved'])->count(),
+        ];
         return Inertia::render('Room', [
             'rooms' => $rooms,
             'rates' => $finalRates,
-            'filter' => $filter
+            'filter' => $filter,
+            'count' => $count
         ]);
     }
 

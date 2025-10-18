@@ -39,6 +39,11 @@ interface Props {
   };
   rates: Rate[];
   filter: string;
+  count: {
+    all: number;
+    available: number;
+    booked: number;
+  };
 }
 
 const defaultFacilities = [
@@ -102,7 +107,7 @@ export const roomColumns: Column<Room>[] = [
   },
 ];
 
-export default function Room({ rooms, rates, filter }: Props) {
+export default function Room({ rooms, rates, filter, count }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
@@ -225,19 +230,6 @@ export default function Room({ rooms, rates, filter }: Props) {
     }
   };
 
-  const getFilterCounts = () => {
-    const total = rooms.data.length;
-    const available = rooms.data.filter(
-      (room) => room.status === "available"
-    ).length;
-    const booked = rooms.data.filter((room) =>
-      ["booked", "reserved"].includes(room.status)
-    ).length;
-    return { total, available, booked };
-  };
-
-  const { total, available, booked } = getFilterCounts();
-
   return (
     <AuthenticatedLayout>
       <Head title="Quản lý phòng" />
@@ -255,7 +247,7 @@ export default function Room({ rooms, rates, filter }: Props) {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Tất cả({total})
+              Tất cả({count.all})
             </Link>
             <Link
               href={route("rooms.index", { filter: "available" })}
@@ -265,7 +257,7 @@ export default function Room({ rooms, rates, filter }: Props) {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Phòng trống({available})
+              Phòng trống({count.available})
             </Link>
             <Link
               href={route("rooms.index", { filter: "booked" })}
@@ -275,7 +267,7 @@ export default function Room({ rooms, rates, filter }: Props) {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Phòng đã đặt({booked})
+              Phòng đã đặt({count.booked})
             </Link>
           </div>
 

@@ -32,6 +32,8 @@
         "@fortawesome/free-regular-svg-icons": "^7.0.1",
         "@fortawesome/free-solid-svg-icons": "^7.0.1",
         "@fortawesome/react-fontawesome": "^3.0.2",
+        "highcharts": "^12.4.0",
+        "highcharts-react-official": "^3.2.3",
         "react-hot-toast": "^2.6.0"
     }
 }
