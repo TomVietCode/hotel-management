@@ -7,7 +7,9 @@ RUN apk update && apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
-    oniguruma-dev
+    oniguruma-dev \
+    nodejs \
+    pnpm
 
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd xml zip dom
 
